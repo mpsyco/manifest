@@ -9,7 +9,7 @@
       (setf (readtable-case rt) :invert)
       rt))
 
-(defparameter *categories* '(:function :macro :generic-function :slot-accessor :variable :class :condition :constant))
+(defparameter *categories* '(:function :macro :generic-function :slot-accessor :variable :class :condition :constant :method-combination))
 
 (defun start (&key (port 0))
   "Start the manifest server and return the URL to browse. By default
@@ -282,6 +282,12 @@ a true Common Lisp while still working in Allegro's mlisp."
             (find-class symbol nil)
             (subtypep (find-class symbol nil) 'condition)))
   (:docs (documentation (find-class symbol) t)))
+
+(define-category :method-combination (symbol what)
+  (:is (and (symbolp symbol)
+            (ignore-errors
+              (find-method-combination #'make-instance symbol ()))))
+  (:docs (documentation symbol 'method-combination)))
 
 (define-category :variable (symbol what)
   (:is (and (variable-p symbol) (not (is symbol :constant))))
