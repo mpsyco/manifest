@@ -95,7 +95,7 @@ a true Common Lisp while still working in Allegro's mlisp."
                      (:table
                       (dolist (sym names)
                         (html
-                          ((:tr :class (:format "~:[not-documented~;~]~:[ internal~;~]" (docs-for sym what) (exported-p sym)))
+                          ((:tr :class (:format "~:[not-documented~;~]~:[ internal~;~]" (docs-for sym what) (and (exported-p sym) (in-package-p sym package))))
                            (:td :class "symbol" (:print (princ-to-string sym)))
                            (:td :class "docs" (:print (or (docs-for sym what) "NO DOCS!")))))))))
 
@@ -121,6 +121,14 @@ a true Common Lisp while still working in Allegro's mlisp."
 
                 (unless some-docs-p
                   (html (:p "Uh oh! No docs at all.")))))))))))
+
+(defun in-package-p (sym package)
+  (cond
+    ((consp sym)
+     (assert (eql (first sym) 'setf))
+     (in-package-p (second sym) package))
+    (t
+     (eq (symbol-package sym) package))))
 
 (defun exported-p (sym)
   (cond
